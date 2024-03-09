@@ -2,37 +2,47 @@ package com.example.wishlist
 
 import android.os.Bundle
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 class MainActivity : AppCompatActivity() {
-    var items: ArrayList<Item> = ArrayList<Item>()
+    private val items = mutableListOf<Item>()
+    private lateinit var adapter: ItemAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Lookup the RecyclerView in activity layout
-        val wishlistRv = findViewById<RecyclerView>(R.id.wishlistRv)
-        // Create adapter passing in the list of emails
-        var adapter = ItemAdapter(items)
-        // Attach the adapter to the RecyclerView to populate items
-        wishlistRv.adapter = adapter
-        // Set layout manager to position the items
-        wishlistRv.layoutManager = LinearLayoutManager(this)
+        val recyclerView = findViewById<RecyclerView>(R.id.wishlistRv)
+        adapter = ItemAdapter(items)
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(this)
 
-        val name = findViewById<TextView>(R.id.itemNameEt)
-        val price = findViewById<TextView>(R.id.priceEt)
-        val url = findViewById<TextView>(R.id.urlEt)
-        val submit = findViewById<Button>(R.id.submitBtn)
+        val itemNameEditText = findViewById<EditText>(R.id.itemNameEt)
+        val itemPriceEditText = findViewById<EditText>(R.id.priceEt)
+        val itemUrlEditText = findViewById<EditText>(R.id.urlEt)
+        val submitButton = findViewById<Button>(R.id.submitBtn)
 
-        submit.setOnClickListener {
-            items.add(Item(name.text.toString(), url.text.toString(), price.text.toString().toDouble()))
-            // Notify the adapter there's new emails so the RecyclerView layout is updated
-            adapter.notifyDataSetChanged()
+        submitButton.setOnClickListener {
+            val name = itemNameEditText.text.toString()
+            val price = itemPriceEditText.text.toString().toDoubleOrNull()
+            val url = itemUrlEditText.text.toString()
+
+            if (name.isBlank() || price == null || url.isBlank()) {
+                Toast.makeText(this, "Please fill all fields correctly", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val item = Item(name, price, url)
+            adapter.addItem(item)
+
+//            itemNameEditText.text.clear()
+//            itemPriceEditText.text.clear()
+//            itemUrlEditText.text.clear()
         }
-
     }
 }

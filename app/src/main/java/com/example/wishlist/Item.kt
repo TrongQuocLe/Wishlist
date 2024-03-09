@@ -1,7 +1,3 @@
 package com.example.wishlist
 
-class Item (
-    val name: String,
-    val url: String,
-    val price: Double) {
-}
+data class Item(val name: String, val price: Double, val url: String)
